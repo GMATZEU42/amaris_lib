@@ -1,0 +1,61 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.pyc
+
+# Other unwanted files.
+*.suo
+*.sdf
+*.exp
+*.ilk
+*.pdb
+*.idb
+*.lastbuild
+*.log
+*.tlog
+*.ipch
+*.opensdf
+*.vcxproj.user
+*.sbr
+*.bsc
+
+# Precompiled Headers
+*.gch
+*.pch
+*.ncb
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled translation files (GNU Machine Object)
+*.gmo
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.app
+
+#other files that get in the way
+*.dll
+
+.idea/
+.vscode/
+
+#cmake building folders
+cmakebuild/
+
+#images 
+*.png
+
+#data
+*.csv
+
