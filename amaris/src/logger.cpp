@@ -86,7 +86,7 @@ namespace amaris
 			file.close();
 		}
 	}
-	/*
+
 	void LoggerConsole::log(LogLevel lvl, std::string s)
 	{
 		ConsoleColor cc;
@@ -109,6 +109,5 @@ namespace amaris
 			break;
 		}
 		m_console.print(m_levelStringMap.at(lvl) + ": " + s + "\n", cc);
-	}
-	*/
+	}	
 }

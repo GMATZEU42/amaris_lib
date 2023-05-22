@@ -1,7 +1,8 @@
 #pragma once
 
-#include "amaris_export.h"
+#include "amaris.h"
 
+#include <iostream>
 #include <string>
 #include <mutex>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "amaris_export.h"
+#include "amaris.h"
 
 #include <filesystem>
 #include <fstream>

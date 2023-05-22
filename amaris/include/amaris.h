@@ -1,6 +1,11 @@
 #pragma once
 
-#include "application.h"
-#include "console.h"
-#include "logger.h"
-#include "parser.h"
+#ifdef _WIN32
+#ifdef AMARIS_EXPORT
+#define AMARIS_API __declspec(dllexport)
+#else
+#define AMARIS_API __declspec(dllimport)
+#endif
+#else	// case unix
+#define AMARIS_API __attribute__ ((visibility ("default")))
+#endif

@@ -4,12 +4,20 @@
 
 namespace amaris
 {
-	// Public methods 
-	Application::Application()
-	{};
-
-	Application::~Application()
-	{};
+	// Public methods
+	Application::Application(const std::string nameApp) : m_appName(nameApp), m_logger(std::filesystem::current_path(), nameApp, "log")
+	{		
+		m_helpMsg =
+		{
+			"Hello everyone, this is an " + m_appName + "\n"
+			"These are options for lunch\n"
+			"[-h | --help]\t print an usage message\n"
+			"[-d | --debug]\t set debug mode while computing\n"
+			"During the run there are these commands avaible:\n"
+			"[e | exit]\t to exit the application\n"
+			"[h | help]\t to print the help menu\n"
+		};
+	}
 
 	void Application::init(int argc, char* argv[])
 	{
@@ -25,6 +33,7 @@ namespace amaris
 
 	void Application::run()
 	{
+		printHelp();
 		std::string inp = "";
 		m_bRun = true;
 		while (m_bRun)
@@ -34,6 +43,12 @@ namespace amaris
 		}
 	}
 
+	void Application::exit()
+	{
+		// Stop the run.
+		m_bRun = false;
+	}
+
 	// Private methods
 	void Application::processInput(const std::string inp)
 	{
@@ -41,8 +56,35 @@ namespace amaris
 		{
 			printHelp();
 		}
-
+		else if (inp == "e" || inp == "exit")
+		{
+			exit();
+		}
 	}
+
+	void Application::addHelpMessageLine(const std::string& shortCmd, const std::string& longCmd, const std::string& description, const std::string& inputs)
+	{
+		if (inputs.empty())
+		{
+			m_helpMsg += "[" + shortCmd + " | " + longCmd + "]\t" + description + "\n";
+		}
+		else
+		{
+			m_helpMsg += "[" + shortCmd + " | " + longCmd + " <" + inputs + ">" +	"]\t" + description + "\n";
+		}
+	}
+
+	bool Application::findCommand(std::string inp, std::string shortName, std::string longName)
+	{
+		if ((shortName.length() == 1U) && (shortName.compare(0, 1, inp, 0, 1) == 0) || (inp.find(longName) != std::string::npos))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	};
 
 	void Application::configFileInit(std::filesystem::path configFilePath)
 	{
@@ -78,20 +120,11 @@ namespace amaris
 
 	void Application::printHelp()
 	{
-		std::string helpString =
-		{
-			"Hello everyone, this is an application that calculate prime numbers.\n"
-			"[-h | --help]\t print an usage message\n"
-			"[-l | --load <path>]\t set the path where to load primes\n"
-			"[-s | --save <path>]\t set the path where to save primes\n"
-			"[-t | --threshold <number>]\t set the when to stop the computation\n"
-			"[-d | --debug]\t set debug mode while computing\n"
-			"During the computation there are these commands avaible:\n"
-			"[c | compute]\t to start the computation\n"
-			"[s | stop]\t to stop the computation immediately\n"
-			"[e | exit]\t to exit the application\n"
-			"[h | help]\t to print the help menu\n"
-		};
-		m_console.print(helpString, amaris::ConsoleColor::ORANGE);
+		m_console.print(m_helpMsg, amaris::ConsoleColor::ORANGE);
+	}
+
+	void Application::printNotValidCommand()
+	{
+		m_console.print("Command not recognised", amaris::ConsoleColor::RED);
 	}
 }

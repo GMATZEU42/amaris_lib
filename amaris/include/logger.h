@@ -1,8 +1,8 @@
 #pragma once
 
-#include "amaris_export.h"
+#include "amaris.h"
 
-//#include "console.h"
+#include "console.h"
 
 #include <string>
 #include <memory>
@@ -90,15 +90,15 @@ namespace amaris
 		void logException(std::string e);
 	};
 	
-	//class AMARIS_API LoggerConsole : public LoggerBase
-	//{
-	//public:
-	//	LoggerConsole(ConsoleColor color = ConsoleColor::NATIVE) : m_console(color) {};
-	//	~LoggerConsole() {};
-	//	void log(LogLevel lvl, std::string log) override;
-	//private:
-	//	Console m_console;
-	//};
+	class AMARIS_API LoggerConsole : public LoggerBase
+	{
+	public:
+		LoggerConsole(ConsoleColor color = ConsoleColor::NATIVE) : m_console(color) {};
+		~LoggerConsole() {};
+		void log(LogLevel lvl, std::string log) override;
+	private:
+		Console m_console;
+	};
 
 	/*
 	template <>
