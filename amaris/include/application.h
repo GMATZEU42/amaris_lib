@@ -23,13 +23,14 @@ namespace amaris
 		void run();
 	protected:
 		//
-		virtual void processInput(const std::string inp);
+		virtual void processInput(const std::string inp) = 0;
+		bool processDefaultInput(const std::string inp);
 		void addHelpMessageLine(const std::string& shortCmd, const std::string& longCmd, const std::string& description, const std::string& inputs = "");
 		//
 		bool findCommand(std::string inp, std::string shortName, std::string longName);
 		void printNotValidCommand();
 		void printHelp();
-
+		//
 		template <typename T>
 		bool getParams(const std::string& inp, T& param)
 		{

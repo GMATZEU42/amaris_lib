@@ -50,16 +50,20 @@ namespace amaris
 	}
 
 	// Private methods
-	void Application::processInput(const std::string inp)
+	bool Application::processDefaultInput(const std::string inp)
 	{
+		bool bRecognized = false;
 		if (inp == "h" || inp == "help")
 		{
+			bRecognized = true;
 			printHelp();
 		}
 		else if (inp == "e" || inp == "exit")
 		{
+			bRecognized = true;
 			exit();
 		}
+		return bRecognized;
 	}
 
 	void Application::addHelpMessageLine(const std::string& shortCmd, const std::string& longCmd, const std::string& description, const std::string& inputs)
