@@ -4,10 +4,10 @@
 
 using amaris::Application;
 
-class TestApplication : public Application
+class SlavePromptApp : public Application
 {
 public:
-	TestApplication(std::string name);
+	SlavePromptApp(std::string name);
 	void doStuffs1(int parameter);
 	void doStuffs2(double param1);	
 protected:

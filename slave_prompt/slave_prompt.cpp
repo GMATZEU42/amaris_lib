@@ -1,23 +1,23 @@
-#include "test_application.h"
+#include "slave_prompt.h"
 
 
-TestApplication::TestApplication(std::string name) : Application(name)
+SlavePromptApp::SlavePromptApp(std::string name) : Application(name)
 {
 	addHelpMessageLine("s", "stuff1", "do stuff with a number", "integer");
 	addHelpMessageLine("q", "stuff2", "do stuff with a number", "double");
 }
 
-void TestApplication::doStuffs1(int params)
+void SlavePromptApp::doStuffs1(int params)
 {
 	m_console.print("Doing " + std::to_string(params) + " stuffs");
 }
 
-void TestApplication::doStuffs2(double param1)
+void SlavePromptApp::doStuffs2(double param1)
 {
 	m_console.print("Doing stuffs whit " + std::to_string(param1));
 }
 
-void TestApplication::processInput(const std::string inp)
+void SlavePromptApp::processInput(const std::string inp)
 {
 	Application::processInput(inp);		
 	if (findCommand(inp, "s", "stuff1"))

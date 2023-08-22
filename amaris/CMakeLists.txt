@@ -1,7 +1,6 @@
 file(GLOB INCLUDES_LIST "include/*.h" )
 file(GLOB SOURCES_LIST "src/*.cpp" )
 
-
 include_directories(include)
 
 add_library(amaris SHARED ${SOURCES_LIST} ${INCLUDES_LIST})
