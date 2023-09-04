@@ -1,4 +1,4 @@
-#include "communication.h"
+#include "network.h"
 #include "amaris.h"
 
 #include <Windows.h>
@@ -10,7 +10,7 @@ namespace amaris
 	public:
 		WinCom(const std::string& name);
 		~WinCom() override;
-		void received(std::string& msg) override;
+		void received() override;
 		void send(const std::string& msg) override;
 	private:
 		HANDLE m_hSerial = NULL;

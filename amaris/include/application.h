@@ -32,11 +32,12 @@ namespace amaris
 		void printHelp();
 		//
 		template <typename T>
-		bool getParams(const std::string& inp, T& param)
+		bool getParams(const std::string& inp, const std::string commandName, T& param)
 		{
+			static_assert(!std::is_same<T, std::string>::value);
 			// get params
 			param = T{};
-			std::string sParam = inp.substr(inp.find(" ") + 1U);
+			std::string sParam = inp.substr(inp.find(commandName + " ") + 1U);
 			std::from_chars_result res = std::from_chars(sParam.data(), sParam.data() + sParam.size(), param);
 			if (res.ec == std::errc())
 			{
@@ -53,8 +54,11 @@ namespace amaris
 			else
 			{
 				return false;
-			}		
-		}
+			}
+		};
+		// std::string specialization
+		template<>
+		bool Application::getParams<std::string>(const std::string& inp, const std::string commandName, std::string& param);
 	protected:
 		//
 		Console m_console = Console(amaris::ConsoleColor::ORANGE, ">> ", true);

@@ -21,10 +21,15 @@ namespace amaris
 		}
 	}
 
-	Logger::Logger(std::filesystem::path filePath, std::string fileName, std::string fileLog)
+	Logger::Logger(std::filesystem::path filePath, std::string fileName, std::string fileFormat)
 	{
-		m_pLogger = std::make_unique<LoggerFile>(filePath, fileName, fileLog);
+		m_pLogger = std::make_unique<LoggerFile>(filePath, fileName, fileFormat);
 	}	
+
+	void Logger::log(LogLevel lvl, std::string log)
+	{
+		m_pLogger->log(lvl, log);
+	}
 
 	//Logger::Logger(ConsoleColor color)
 	//{
@@ -46,6 +51,17 @@ namespace amaris
 				logException(exceptionLog);
 				throw(LoggerFileException(ExceptionType::CANNOT_CREATE_DIR));
 			}
+		}
+	}
+
+	void LoggerFile::logException(std::string e)
+	{
+		std::cout << e << std::endl;
+		auto file = std::fstream((std::filesystem::current_path() / std::filesystem::path("error.log")).string(), std::ios_base::out);
+		if (file.is_open())
+		{
+			file << e;
+			file.close();
 		}
 	}
 
@@ -73,17 +89,6 @@ namespace amaris
 		catch (...)
 		{
 			// ops!
-		}
-	}
-
-	void LoggerFile::logException(std::string e)
-	{
-		std::cout << e << std::endl;
-		auto file = std::fstream((std::filesystem::current_path() / std::filesystem::path("error.log")).string(), std::ios_base::out);
-		if (file.is_open())
-		{
-			file << e;
-			file.close();
 		}
 	}
 

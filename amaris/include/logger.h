@@ -32,15 +32,11 @@ namespace amaris
 	{
 	public:
 		explicit Logger(LoggerType type);
-		Logger(std::filesystem::path filePath, std::string fileName, std::string fileLog);
+		Logger(std::filesystem::path filePath, std::string fileName, std::string fileFormat);
 		//Logger(ConsoleColor color);
 		~Logger() {};
 		//
-		template <typename T> 
-		void log(LogLevel lvl, T log)
-		{
-			m_pLogger->log(lvl, std::to_string(log));
-		}
+		void log(LogLevel lvl, std::string log);
 	private:
 		std::unique_ptr<LoggerBase> m_pLogger;
 	};
@@ -99,26 +95,6 @@ namespace amaris
 	private:
 		Console m_console;
 	};
-
-	/*
-	template <>
-	void Logger::log(LogLevel lvl, std::string log)
-	{
-		m_pLogger->log(lvl, log);
-	}
-
-	template <>
-	void Logger::log(LogLevel lvl, char* log)
-	{
-		m_pLogger->log(lvl, std::string(log));
-	}
-
-	template <>
-	void Logger::log(LogLevel lvl, const char* log)
-	{
-		m_pLogger->log(lvl, std::string(log));
-	}
-	*/
 }
 
 

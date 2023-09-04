@@ -1,10 +1,12 @@
 #include "slave_prompt.h"
 
+using amaris::SocketEvent;
 
-SlavePromptApp::SlavePromptApp(std::string name) : Application(name)
+SlavePromptApp::SlavePromptApp(std::string name) : Application(name), SlaveConsole()
 {
-	addHelpMessageLine("s", "stuff1", "do stuff with a number", "integer");
-	addHelpMessageLine("q", "stuff2", "do stuff with a number", "double");
+	m_socket.addListener(this);
+	//addHelpMessageLine("", "stuff1", "do stuff with a number", "integer");
+	//addHelpMessageLine("", "stuff2", "do stuff with a number", "double");
 }
 
 void SlavePromptApp::doStuffs1(int params)
@@ -19,30 +21,62 @@ void SlavePromptApp::doStuffs2(double param1)
 
 void SlavePromptApp::processInput(const std::string inp)
 {
-	Application::processInput(inp);		
-	if (findCommand(inp, "s", "stuff1"))
+	if (!Application::processDefaultInput(inp))
 	{
-		int p1{};
-		if (getParams(inp, p1))
+		if (findCommand(inp, "s", "stuff1"))
 		{
-			doStuffs1(p1);
+			int p1{};
+			if (getParams(inp, "stuff1",  p1))
+			{
+				doStuffs1(p1);
+			}
+			else
+			{
+				printNotValidCommand();
+				printHelp();
+			}
+
+		}
+		else if (findCommand(inp, "q", "stuff2"))
+		{
+			double p1{};
+			if (getParams(inp, "stuff2", p1))
+			{
+				doStuffs2(p1);
+			}
+			else
+			{
+				printNotValidCommand();
+				printHelp();
+			}
+		}
+		else if (findCommand(inp, "p", "print"))
+		{
+			std::string s;
+			if (getParams(inp, "print", s))
+			{
+				m_console.print(s);
+			}
+			else
+			{
+				printNotValidCommand();
+				printHelp();
+			}
 		}
 		else
 		{
 			printNotValidCommand();
 			printHelp();
 		}
+	}	
+}
 
-	}
-	else if (findCommand(inp, "q", "stuff2"))
+void SlavePromptApp::update(const Event& event)
+{
+	if (event.getType() == SocketEvent::Type::RECEIVED_MESSAGE)
 	{
-		double p1{};
-		getParams(inp, p1);
-		doStuffs2(p1);
-	}
-	else
-	{
-		printNotValidCommand();
-		printHelp();
+		std::string s;
+		m_socket.getMessage(s);
+		m_console.print(s);
 	}
 }

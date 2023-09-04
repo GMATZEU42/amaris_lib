@@ -21,12 +21,12 @@ namespace amaris
 			if (GetLastError() == ERROR_FILE_NOT_FOUND)
 			{
 				//serial port does not exist. Inform user.
-				m_errorState = COM_ERROR::SERIAL_PORT_DOESNT_EXIST;
+				m_state = COM_STATE::SERIAL_PORT_DOESNT_EXIST;
 			}
 			else
 			{
 				//some other error occurred. Inform user.
-				m_errorState = COM_ERROR::ERROR_OPENING_SERIAL_PORT;
+				m_state = COM_STATE::ERROR_OPENING_SERIAL_PORT;
 			}
 		}
 		else
@@ -35,7 +35,7 @@ namespace amaris
 			if (!GetCommState(m_hSerial, &m_dcbSerialParams)) 
 			{
 				//error getting state
-				m_errorState = COM_ERROR::GETTING_STATE_ERROR;
+				m_state = COM_STATE::GETTING_STATE_ERROR;
 			}
 
 			m_dcbSerialParams.BaudRate = CBR_115200;
@@ -58,19 +58,19 @@ namespace amaris
 			if (!SetCommState(m_hSerial, &m_dcbSerialParams))
 			{
 				//error setting serial port state
-				m_errorState = COM_ERROR::SETTING_STATE_ERROR;
+				m_state = COM_STATE::SETTING_STATE_ERROR;
 			}
 			if (!GetCommState(m_hSerial, &m_dcbSerialParams))
 			{
-				m_errorState = COM_ERROR::GETTING_STATE_ERROR;
+				m_state = COM_STATE::GETTING_STATE_ERROR;
 			}
 			if (!BuildCommDCB("baud=115200 parity=n data=8 stop=1", &m_dcbSerialParams))
 			{
-				m_errorState = COM_ERROR::BUILDING_DCB_ERROR;
+				m_state = COM_STATE::BUILDING_DCB_ERROR;
 			}
 		}
 
-		if (m_bUseTimeout && COM_ERROR::COM_OK == m_errorState)
+		if (m_bUseTimeout && COM_STATE::COM_READY == m_state)
 		{
 			m_timeouts.ReadIntervalTimeout = 50;
 			m_timeouts.ReadTotalTimeoutConstant = 0;
@@ -80,11 +80,11 @@ namespace amaris
 			if (!SetCommTimeouts(m_hSerial, &m_timeouts)) 
 			{
 				//error occureed. Inform user
-				m_errorState = COM_ERROR::SETTING_TIMEOUT_ERROR;
+				m_state = COM_STATE::SETTING_TIMEOUT_ERROR;
 			}
 		}
 
-		if (COM_ERROR::COM_OK == m_errorState)
+		if (COM_STATE::COM_READY == m_state)
 		{
 			if (!EscapeCommFunction(m_hSerial, CLRDTR))
 			{
@@ -102,16 +102,28 @@ namespace amaris
 		CloseHandle(m_hSerial);
 	}
 
-	void WinCom::received(std::string& msg)
+	void WinCom::received()
 	{
-		char szBuff[BUFFER_SIZE + 1] = { 0 };
+		char buffer[BUFFER_SIZE] = { 0 };
+		size_t sizeBuffer = sizeof(buffer);
 		DWORD dwBytesRead = 0;
-		if (!ReadFile(m_hSerial, szBuff, BUFFER_SIZE, &dwBytesRead, NULL))
+		m_state = m_bPollingActive ? COM_STATE::POLLING_FROM : m_state;
+		while (m_bPollingActive)
 		{
-			//error occurred. Report to user.
-			m_errorState = COM_ERROR::RECEIVING_ERROR;
+			if (!ReadFile(m_hSerial, buffer, BUFFER_SIZE, &dwBytesRead, NULL))
+			{
+				//error occurred. Report to user.
+				m_state = COM_STATE::RECEIVING_ERROR;
+			}
+			else
+			{
+				while (m_flag.test_and_set()) {};
+				m_receivedBuffers.push(std::string(buffer));				
+				memset(buffer, 0, sizeBuffer);
+				m_flag.clear();
+			}
 		}
-
+		m_state = COM_STATE::COM_READY; // to control if it is really so
 	}
 
 	void WinCom::send(const std::string& msg)
@@ -120,13 +132,12 @@ namespace amaris
 		strcpy(szBuff, msg.c_str());
 		szBuff[strlen(msg.c_str())] = '\n';
 		DWORD dwBytesRead = 0;
-		DWORD size = (DWORD)sizeof(szBuff);
 		DWORD len = (DWORD)strlen(szBuff);
 		if (!WriteFile(m_hSerial, szBuff, len, &dwBytesRead, NULL))
 		{
 			//error occurred. Report to user.
 			auto lastError = GetLastError();
-			m_errorState = COM_ERROR::SENDING_ERROR;
+			m_state = COM_STATE::SENDING_ERROR;
 		}	
 	}
 

@@ -63,18 +63,36 @@ namespace amaris
 			bRecognized = true;
 			exit();
 		}
+		else if (inp.empty())
+		{
+			bRecognized = true;
+		}
 		return bRecognized;
 	}
 
 	void Application::addHelpMessageLine(const std::string& shortCmd, const std::string& longCmd, const std::string& description, const std::string& inputs)
 	{
-		if (inputs.empty())
+		if (!shortCmd.empty())
 		{
-			m_helpMsg += "[" + shortCmd + " | " + longCmd + "]\t" + description + "\n";
+			if (inputs.empty())
+			{
+				m_helpMsg += "[" + shortCmd + " | " + longCmd + "]\t" + description + "\n";
+			}
+			else
+			{
+				m_helpMsg += "[" + shortCmd + " | " + longCmd + " <" + inputs + ">" + "]\t" + description + "\n";
+			}
 		}
 		else
 		{
-			m_helpMsg += "[" + shortCmd + " | " + longCmd + " <" + inputs + ">" +	"]\t" + description + "\n";
+			if (inputs.empty())
+			{
+				m_helpMsg += "[" + longCmd + "]\t" + description + "\n";
+			}
+			else
+			{
+				m_helpMsg += "[" + longCmd + " <" + inputs + ">" + "]\t" + description + "\n";
+			}
 		}
 	}
 
@@ -124,11 +142,19 @@ namespace amaris
 
 	void Application::printHelp()
 	{
-		m_console.print(m_helpMsg, amaris::ConsoleColor::ORANGE);
+		m_console.print(m_helpMsg);
 	}
 
 	void Application::printNotValidCommand()
 	{
 		m_console.print("Command not recognised", amaris::ConsoleColor::RED);
+	}
+
+	template<>
+	bool Application::getParams<std::string>(const std::string& inp, const std::string commandName, std::string& param)
+	{
+		// get params
+		param = inp.substr((commandName + " ").size());
+		return !param.empty();
 	}
 }
