@@ -7,11 +7,18 @@ ComNucleoApp::ComNucleoApp(std::string name) : Application(name), MasterConsole(
 {	
 	m_console.setColor(amaris::ConsoleColor::AZURE);
 
-	addHelpMessageLine("", "log on", "Activate log on the nucleo. These are saved on ", "integer");
-	addHelpMessageLine("", "log off", "do stuff with a number", "double");
+	addHelpMessageLine("", "log on", "Activate log on the nucleo. These are saved on ", "");
+	addHelpMessageLine("", "log off", "Deactivate logging from the nucleo", "");
+	addHelpMessageLine("", "set flow", "Set the flow", "double");
+	addHelpMessageLine("", "start pid", "Start the flow in closed loop", "");
+	addHelpMessageLine("", "stop pid", "Stop the flow in closed loop", "");
+	addHelpMessageLine("", "set pid", "Set the parameters for the closed loop (Kp, Ki, Kd)", "double, double, double");
+	addHelpMessageLine("", "add procedure", "Set the procedure", "double,double double,double");
+	addHelpMessageLine("", "reset procedure", "Clear the old procedure", "");
+	addHelpMessageLine("", "get com status", "Print the status of the communication with the nucleo", "");
 
 	m_pComPort = amaris::createComPort("COM6");
-
+	startSlaveConsole();
 }
 
 ComNucleoApp::~ComNucleoApp()
@@ -34,27 +41,7 @@ void ComNucleoApp::processInput(const std::string inp)
 {
 	if (!Application::processDefaultInput(inp))
 	{
-		if (findCommand(inp, "", "stuff1"))
-		{
-			int p1{};
-			if (getParams(inp, "stuff1", p1))
-			{
-				//doStuffs1(p1);
-			}
-			else
-			{
-				printNotValidCommand();
-				printHelp();
-			}
-
-		}
-		else if (findCommand(inp, "", "stuff2"))
-		{
-			double p1{};
-			getParams(inp, "stuff2", p1);
-			//doStuffs2(p1);
-		}
-		else if (findCommand(inp, "", "log on"))
+		if (findCommand(inp, "", "log on"))
 		{
 			logHandle(true);
 		}
@@ -64,45 +51,31 @@ void ComNucleoApp::processInput(const std::string inp)
 		}
 		else if (findCommand(inp, "", "set flow"))
 		{
-			// ToDo
+			m_pComPort->send(inp);
 		}
 		else if (findCommand(inp, "", "start pid"))
 		{
-			// ToDo
+			m_pComPort->send("start pid");
 		}
 		else if (findCommand(inp, "", "stop pid"))
 		{
-			// ToDo
+			m_pComPort->send("stop pid");
 		}
 		else if (findCommand(inp, "", "set pid"))
 		{
-			// ToDo
+			m_pComPort->send(inp);
 		}
 		else if (findCommand(inp, "", "reset procedure"))
 		{
-			// ToDo
+			m_pComPort->send("reset procedure");
 		}
 		else if (findCommand(inp, "", "add procedure"))
 		{
-			// ToDo
+			m_pComPort->send(inp);
 		}
 		else if (findCommand(inp, "", "get com status"))
 		{
 			m_console.print(m_pComPort->getComStatus(), amaris::ConsoleColor::GREEN);
-		}
-		else if (findCommand(inp, "", "start slave"))
-		{
-			startSlaveConsole();
-		}
-		else if (findCommand(inp, "", "stop slave"))
-		{
-			stopSlaveConsole();
-		}
-		else if (findCommand(inp, "", "slave print"))
-		{
-			std::string s;
-			getParams(inp, "slave print", s);
-			m_socket.send(s);
 		}
 		else
 		{
@@ -155,7 +128,6 @@ void ComNucleoApp::writeCSV()
 				m_pComPort->stopPolling();
 				m_pComPort->send("log off");
 				m_console.print("Exception" + std::string(e.what()) + " during csv file open, log switched off", amaris::ConsoleColor::RED);
-
 			}
 		}
 	}

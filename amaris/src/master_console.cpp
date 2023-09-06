@@ -24,6 +24,6 @@ namespace amaris
 
 	void MasterConsole::stopSlaveConsole()
 	{
-		// ToDo
+		m_socket.send("exit");
 	}
 }
